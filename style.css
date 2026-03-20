@@ -1,0 +1,326 @@
+:root {
+    --light-bg: #72b1c4;
+    --light-card: #3f7e91;
+    --light-text: #ffffff;
+    --light-btn: #e6e6e6;
+    --light-btn-text: #2c2c2c;
+    --light-accent: #508ea2;
+
+    --dark-bg: #004b63;
+    --dark-card: #01374b;
+    --dark-text: #ffffff;
+    --dark-btn: #e6e6e6;
+    --dark-btn-text: #2c2c2c;
+    --dark-accent: #01283a;
+
+    --success: #4caf50;
+    --error: #f44336;
+
+    --transition-speed: 0.3s;
+}
+
+body.light-theme {
+    --current-bg: var(--light-bg);
+    --current-card: var(--light-card);
+    --current-text: var(--light-text);
+    --current-btn: var(--light-btn);
+    --current-btn-text: var(--light-btn-text);
+    --current-accent: var(--light-accent);
+}
+
+body.dark-theme {
+    --current-bg: var(--dark-bg);
+    --current-card: var(--dark-card);
+    --current-text: var(--dark-text);
+    --current-btn: var(--dark-btn);
+    --current-btn-text: var(--dark-btn-text);
+    --current-accent: var(--dark-accent);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0;
+    overflow: hidden;
+}
+
+.app-container {
+    width: 375px;
+    height: 667px;
+    background-color: var(--current-bg);
+    position: relative;
+    border-radius: 40px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+    transition: background-color var(--transition-speed);
+}
+
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    padding: 20px;
+    color: var(--current-text);
+}
+
+.screen.active {
+    display: flex;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 50px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    color: var(--current-text);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.time-date {
+    text-align: center;
+}
+
+#current-time, .standalone-time {
+    font-family: 'Outfit', sans-serif;
+    font-size: 42px;
+    font-weight: 600;
+}
+
+#current-date {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.content-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logo-section.small {
+    margin-bottom: 5px;
+}
+
+.logo-circle {
+    width: 70px;
+    height: 70px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.logo-circle img {
+    width: 80%;
+    height: auto;
+}
+
+.shop-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.day-badge {
+    background-color: var(--current-card);
+    padding: 12px 40px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 80%;
+    text-align: center;
+}
+
+.illustration-container {
+    width: 150px;
+    height: 150px;
+}
+
+.illustration {
+    width: 100%;
+    height: 100%;
+    color: var(--current-text);
+}
+
+.main-btn {
+    background-color: var(--current-btn);
+    color: var(--current-btn-text);
+    border: none;
+    padding: 18px 60px;
+    border-radius: 40px;
+    font-size: 18px;
+    font-weight: 400;
+    cursor: pointer;
+    width: 85%;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.main-btn:active {
+    transform: scale(0.95);
+}
+
+.input-group {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input-group input {
+    background-color: var(--current-btn);
+    border: none;
+    padding: 18px 25px;
+    border-radius: 40px;
+    color: var(--current-btn-text);
+    font-size: 16px;
+    text-align: center;
+}
+
+.input-group input::placeholder {
+    color: #888;
+}
+
+/* Profile Screen Styles */
+.profile-pic-container {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.3);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.qr-container {
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.info-card {
+    background-color: var(--current-card);
+    width: 90%;
+    padding: 20px;
+    border-radius: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    font-size: 14px;
+}
+
+.info-row .label {
+    opacity: 0.8;
+    margin-right: 5px;
+}
+
+.info-row .value {
+    font-weight: 700;
+}
+
+.divider {
+    height: 1px;
+    background-color: rgba(255,255,255,0.2);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background-color: var(--current-card);
+    width: 85%;
+    padding: 25px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    color: white;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.secondary-btn {
+    background: none;
+    border: 1px solid white;
+    color: white;
+    padding: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+#test-connection-btn.success {
+    background-color: var(--success);
+    color: white;
+}
+
+#test-connection-btn.error {
+    background-color: var(--error);
+    color: white;
+}

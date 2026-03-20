@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudTicket</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body class="light-theme">
+    <div id="app" class="app-container">
+        <!-- Screen 1: Home -->
+        <div id="home-screen" class="screen active">
+            <div class="header">
+                <button id="settings-btn" class="icon-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+                <div class="time-date">
+                    <div id="current-time">12:34</div>
+                    <div id="current-date">25 ОКТЯБРЯ</div>
+                </div>
+                <div style="width: 24px;"></div> <!-- Spacer -->
+            </div>
+
+            <div class="content-main">
+                <div class="logo-section">
+                    <div class="logo-circle">
+                         <img src="C:\Users\artem\.gemini\antigravity\brain\652d19c9-f8a9-4196-9d77-ea3987637b42\app_logo_pekgtu_1773942669181.png" alt="Logo" id="app-logo">
+                    </div>
+                    <h1 class="shop-name">ПЭК ГГТУ</h1>
+                </div>
+
+                <div class="day-badge">ПОНЕДЕЛЬНИК</div>
+
+                <div class="illustration-container">
+                    <svg viewBox="0 0 100 100" class="illustration">
+                        <circle cx="50" cy="40" r="15" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M30 80 Q50 60 70 80" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <rect x="35" y="70" width="30" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+
+                <button id="login-nav-btn" class="main-btn">Вход</button>
+            </div>
+        </div>
+
+        <!-- Screen 2: Login -->
+        <div id="login-screen" class="screen">
+            <div class="header">
+                 <button id="back-to-home" class="icon-btn">
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                 </button>
+                 <div class="time-date standalone-time">12:34</div>
+                 <div style="width: 24px;"></div>
+            </div>
+
+            <div class="content-main">
+                <div class="logo-section small">
+                    <div class="logo-circle">
+                         <img src="C:\Users\artem\.gemini\antigravity\brain\652d19c9-f8a9-4196-9d77-ea3987637b42\app_logo_pekgtu_1773942669181.png" alt="Logo">
+                    </div>
+                </div>
+                <h1 class="shop-name small">ПЭК ГГТУ</h1>
+
+                <div class="day-badge">ПОНЕДЕЛЬНИК</div>
+
+                <div class="illustration-container small">
+                    <svg viewBox="0 0 100 100" class="illustration">
+                        <rect x="30" y="30" width="40" height="50" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <line x1="35" y1="40" x2="65" y2="40" stroke="currentColor" stroke-width="2"/>
+                        <line x1="35" y1="50" x2="65" y2="50" stroke="currentColor" stroke-width="2"/>
+                        <line x1="35" y1="60" x2="55" y2="60" stroke="currentColor" stroke-width="2"/>
+                        <line x1="60" y1="70" x2="80" y2="90" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="Логин" id="login-username">
+                    <input type="password" placeholder="Пароль" id="login-password">
+                </div>
+
+                <button id="do-login-btn" class="main-btn">Войти</button>
+            </div>
+        </div>
+
+        <!-- Screen 3: User Info / QR -->
+        <div id="profile-screen" class="screen">
+            <div class="header">
+                 <button id="back-to-login" class="icon-btn">
+                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+                 </button>
+                 <div class="header-actions">
+                     <button id="theme-toggle" class="icon-btn">
+                         <svg id="theme-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                     </button>
+                     <div class="standalone-time">12:34</div>
+                 </div>
+            </div>
+
+            <div class="content-main profile-content">
+                <div class="profile-pic-container">
+                     <img src="C:\Users\artem\.gemini\antigravity\brain\652d19c9-f8a9-4196-9d77-ea3987637b42\profile_pic_student_1773942684929.png" alt="Profile" id="profile-pic" class="profile-pic">
+                </div>
+
+                <div class="day-badge qr-badge">QR-Доступа</div>
+
+                <div id="qr-container" class="qr-container">
+                    <div id="qrcode"></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="info-row">
+                        <span class="label">ФИО:</span>
+                        <span class="value" id="user-fullname">Библев Артём Викторович</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="info-row">
+                        <span class="label">Группа:</span>
+                        <span class="value" id="user-group">ИСП.23А</span>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="info-row">
+                        <span class="label">Организация:</span>
+                        <span class="value" id="user-org">ГОУ ВО МО ПЭК ГГТУ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Server Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <h2>Настройки сервера</h2>
+                <div class="input-group">
+                    <label for="server-ip">IP адрес</label>
+                    <input type="text" id="server-ip" placeholder="192.168.1.1">
+                    <label for="server-port">Порт</label>
+                    <input type="text" id="server-port" placeholder="8080">
+                </div>
+                <div class="modal-actions">
+                    <button id="test-connection-btn" class="main-btn">Проверить подключение</button>
+                    <button id="close-settings-btn" class="secondary-btn">Закрыть</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
