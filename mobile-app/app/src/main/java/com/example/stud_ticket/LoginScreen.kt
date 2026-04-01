@@ -1,11 +1,14 @@
 package com.example.stud_ticket
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,16 +18,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.navigation.NavController
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.res.painterResource
 import com.example.stud_ticket.network.RetrofitClient
 import kotlinx.coroutines.launch
-import androidx.compose.material3.CircularProgressIndicator
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,8 +34,7 @@ fun LoginScreen(
     onThemeToggle: () -> Unit,
     onLoginSuccess: (UserData) -> Unit
 ) {
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var barcode by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
@@ -62,22 +60,11 @@ fun LoginScreen(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.Black)
-                            .padding(8.dp)
-                            .clickable { onThemeToggle() },
-                        contentAlignment = Alignment.Center
-                    ) {
+                    IconButton(onClick = onThemeToggle) {
                         Icon(
-                            painter = painterResource(
-                                id = if (isDarkMode) android.R.drawable.ic_menu_today else android.R.drawable.ic_menu_day
-                            ),
+                            imageVector = if (isDarkMode) Icons.Default.WbSunny else Icons.Default.Brightness3,
                             contentDescription = "Theme Toggle",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
@@ -92,8 +79,13 @@ fun LoginScreen(
                 shape = CircleShape,
                 color = Color.White,
                 modifier = Modifier.size(60.dp)
-                // content = { Image(...) }
-            ) {}
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.logo_pek),
+                    contentDescription = "Logo",
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(16.dp))
             Text("ПЭК ГГТУ", fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
 
@@ -106,7 +98,7 @@ fun LoginScreen(
                 modifier = Modifier.width(280.dp)
             ) {
                 Text(
-                    "ПОНЕДЕЛЬНИК", 
+                    "СРЕДА", 
                     modifier = Modifier.padding(14.dp), 
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = Color.White,
@@ -117,9 +109,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(40.dp))
 
             // Illustration
-            Box(modifier = Modifier.size(100.dp)) {
-                // Illustration placeholder
-            }
+            Box(modifier = Modifier.size(100.dp)) {}
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -129,26 +119,9 @@ fun LoginScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 TextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    placeholder = { Text("Логин", color = Color.Gray) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(32.dp),
-                    colors = TextFieldDefaults.colors(
-                        focusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.tertiary,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black
-                    )
-                )
-
-                TextField(
-                    value = password,
-                    onValueChange = { password = it },
-                    placeholder = { Text("Пароль", color = Color.Gray) },
-                    visualTransformation = PasswordVisualTransformation(),
+                    value = barcode,
+                    onValueChange = { barcode = it },
+                    placeholder = { Text("Код студенческого билета", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(32.dp),
                     colors = TextFieldDefaults.colors(
@@ -173,8 +146,6 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // No separate login button in the second screenshot, but usually it's there or part of the flow.
-            // I'll keep the navigation for now but stylize it as a pill if needed.
             Button(
                 onClick = {
                     if (!isLoading) {
@@ -182,25 +153,22 @@ fun LoginScreen(
                             isLoading = true
                             errorMessage = null
                             try {
-                                val response = RetrofitClient.instance.login(LoginRequest(username, password))
-                                if (response.isSuccessful && response.body()?.status == "success") {
-                                    val loginResponse = response.body()!!
-                                    loginResponse.user?.let { onLoginSuccess(it) }
-                                    navController.navigate(Screen.Profile.route)
+                                val response = RetrofitClient.instance.getStudents()
+                                if (response.isSuccessful) {
+                                    val students = response.body() ?: emptyList()
+                                    val foundUser = students.find { it.ticketNumber == barcode }
+                                    if (foundUser != null) {
+                                        onLoginSuccess(foundUser)
+                                        navController.navigate(Screen.Profile.route)
+                                    } else {
+                                        errorMessage = "Пользователь с таким номером билета не найден."
+                                    }
                                 } else {
                                     val errorBody = response.errorBody()?.string()
-                                    errorMessage = if (errorBody != null) {
-                                        try {
-                                            JSONObject(errorBody).getJSONObject("errors").getJSONArray("email").getString(0)
-                                        } catch (e: Exception) {
-                                            "Неверный логин или пароль."
-                                        }
-                                    } else {
-                                        "Ошибка входа."
-                                    }
+                                    errorMessage = if (errorBody != null) errorBody else "Ошибка сервера (Код: ${response.code()})"
                                 }
                             } catch (e: Exception) {
-                                errorMessage = "Сеть недоступна."
+                                errorMessage = "Сеть: ${e.message}"
                             } finally {
                                 isLoading = false
                             }

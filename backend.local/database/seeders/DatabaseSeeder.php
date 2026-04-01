@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'fio' => 'Библев Артём Викторович',
             'group' => 'ИСП.23А',
             'organization' => 'ГОУ ВО МО ПЭК ГГТУ',
+            'barcode' => '12345678',
         ]);
     }
 }

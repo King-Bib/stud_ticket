@@ -1,6 +1,7 @@
 package com.example.stud_ticket
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.ui.res.painterResource
@@ -9,6 +10,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -55,30 +58,19 @@ fun HomeScreen(
                 }
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color.Black)
-                            .padding(8.dp)
-                            .clickable { onThemeToggle() },
-                        contentAlignment = Alignment.Center
-                    ) {
+                    IconButton(onClick = onThemeToggle) {
                         Icon(
-                            painter = painterResource(
-                                id = if (isDarkMode) android.R.drawable.ic_menu_today else android.R.drawable.ic_menu_day
-                            ),
+                            imageVector = if (isDarkMode) Icons.Default.WbSunny else Icons.Default.Brightness3,
                             contentDescription = "Theme Toggle",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     RealTimeText(fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.White)
                 }
             }
-
-            RealDateText(fontSize = 16.sp, color = Color.White.copy(alpha = 0.8f))
+                
+                RealDateText(fontSize = 16.sp, color = Color.White.copy(alpha = 0.8f))
 
             Spacer(modifier = Modifier.height(30.dp))
 
@@ -89,7 +81,11 @@ fun HomeScreen(
                     color = Color.White,
                     modifier = Modifier.size(60.dp)
                 ) {
-                   // Logo Image
+                    Image(
+                        painter = painterResource(id = R.drawable.logo_pek),
+                        contentDescription = "Logo",
+                        modifier = Modifier.padding(4.dp)
+                    )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 Text("ПЭК ГГТУ", fontSize = 24.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
@@ -104,7 +100,7 @@ fun HomeScreen(
                 modifier = Modifier.width(280.dp)
             ) {
                 Text(
-                    "ПОНЕДЕЛЬНИК", 
+                    "СРЕДА", 
                     modifier = Modifier.padding(16.dp), 
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = Color.White,

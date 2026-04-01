@@ -25,6 +25,7 @@ class User extends Authenticatable
         'group',
         'organization',
         'avatar_path',
+        'barcode',
     ];
 
     /**

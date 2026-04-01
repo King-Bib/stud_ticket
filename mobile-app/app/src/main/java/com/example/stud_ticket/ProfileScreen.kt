@@ -8,6 +8,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,15 +24,61 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import com.google.zxing.EncodeHintType
 import android.graphics.Bitmap
+import java.util.EnumMap
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import com.example.stud_ticket.network.RetrofitClient
+import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
+import java.io.FileOutputStream
+
+import android.widget.Toast
 
 @Composable
 fun ProfileScreen(
     navController: NavController,
     isDarkMode: Boolean,
     onThemeToggle: () -> Unit,
-    userData: UserData
+    userData: UserData,
+    onUserUpdate: (UserData) -> Unit,
+    onSaveLocalPhoto: (String, String) -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var isUploading by remember { mutableStateOf(false) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                isUploading = true
+                try {
+                    val file = uriToFile(context, it)
+                    val localPath = file.absolutePath
+                    
+                    // Save locally instead of server
+                    onSaveLocalPhoto(userData.id.toString(), localPath)
+                    onUserUpdate(userData.copy(photoUrl = localPath))
+                    
+                    Toast.makeText(context, "Фото успешно обновлено", Toast.LENGTH_SHORT).show()
+                } catch (e: Exception) {
+                    Toast.makeText(context, "Ошибка сохранения: ${e.message}", Toast.LENGTH_LONG).show()
+                } finally {
+                    isUploading = false
+                }
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -54,9 +102,7 @@ fun ProfileScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = onThemeToggle) {
                         Icon(
-                            painter = painterResource(
-                                id = if (isDarkMode) android.R.drawable.ic_menu_today else android.R.drawable.ic_menu_day
-                            ),
+                            imageVector = if (isDarkMode) Icons.Default.WbSunny else Icons.Default.Brightness3,
                             contentDescription = "Theme Toggle",
                             tint = Color.White
                         )
@@ -67,13 +113,29 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Profile Pic
-            Surface(
-                shape = CircleShape,
-                color = Color.Gray,
-                modifier = Modifier.size(100.dp)
+            // Profile Pic (Click to change)
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(Color.Gray)
+                    .clickable { if (!isUploading) launcher.launch("image/*") },
+                contentAlignment = Alignment.Center
             ) {
-                // In a real app, use Image(painterResource(id = R.drawable.profile_pic))
+                if (userData.photoUrl != null) {
+                    AsyncImage(
+                        model = userData.photoUrl,
+                        contentDescription = "Avatar",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                    )
+                } else {
+                    Icon(painterResource(id = android.R.drawable.ic_menu_camera), contentDescription = "Pick Image", tint = Color.White)
+                }
+                
+                if (isUploading) {
+                    CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White)
+                }
             }
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -96,8 +158,9 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
             // QR Code with interaction
-            val qrText = "${userData.fio ?: "Unknown"}|${userData.group ?: "N/A"}|${userData.organization ?: "N/A"}"
-            val qrBitmap = remember { generateQrCode(qrText, 400) }
+            // Simplified format for better scanner compatibility
+            val qrText = "${userData.lastName}|${userData.firstName}|${userData.ticketNumber}"
+            val qrBitmap = remember(qrText) { generateQrCode(qrText, 400) }
             var showInfo by remember { mutableStateOf(false) }
 
             Box(contentAlignment = Alignment.Center) {
@@ -130,8 +193,8 @@ fun ProfileScreen(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("Данные кода:", color = Color.Gray, fontSize = 10.sp)
-                            Text(userData.fio ?: "N/A", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
-                            Text(userData.group ?: "N/A", color = Color.White, fontSize = 12.sp)
+                            Text(userData.fio, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                            Text(userData.ticketNumber ?: "N/A", color = Color.White, fontSize = 12.sp)
                         }
                     }
                 }
@@ -146,15 +209,27 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(0.95f)
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    InfoRow(label = "ФИО:", value = userData.fio ?: "N/A")
+                    InfoRow(label = "ФИО:", value = userData.fio)
                     Divider(color = Color.White.copy(alpha = 0.2f))
                     InfoRow(label = "Группа:", value = userData.group ?: "N/A")
                     Divider(color = Color.White.copy(alpha = 0.2f))
-                    InfoRow(label = "Организация:", value = userData.organization ?: "N/A")
+                    InfoRow(label = "Код специальности:", value = userData.faculty ?: "N/A")
+                    Divider(color = Color.White.copy(alpha = 0.2f))
+                    InfoRow(label = "Номер студенческого билета:", value = userData.ticketNumber ?: "N/A")
                 }
             }
         }
     }
+}
+
+private fun uriToFile(context: android.content.Context, uri: android.net.Uri): File {
+    val inputStream = context.contentResolver.openInputStream(uri)
+    val tempFile = File(context.cacheDir, "temp_avatar_${System.currentTimeMillis()}.jpg")
+    val outputStream = FileOutputStream(tempFile)
+    inputStream?.copyTo(outputStream)
+    inputStream?.close()
+    outputStream.close()
+    return tempFile
 }
 
 @Composable
@@ -168,7 +243,10 @@ fun InfoRow(label: String, value: String) {
 
 fun generateQrCode(text: String, size: Int): Bitmap? {
     return try {
-        val bitMatrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
+        val hints = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java)
+        hints[EncodeHintType.CHARACTER_SET] = "UTF-8"
+        
+        val bitMatrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size, hints)
         val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
         for (x in 0 until size) {
             for (y in 0 until size) {

@@ -16,15 +16,14 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+            'barcode' => 'required',
         ]);
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('barcode', $request->barcode)->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (! $user) {
             throw ValidationException::withMessages([
-                'email' => ['Неверный логин или пароль.'],
+                'barcode' => ['Неверный код доступа.'],
             ]);
         }
 
