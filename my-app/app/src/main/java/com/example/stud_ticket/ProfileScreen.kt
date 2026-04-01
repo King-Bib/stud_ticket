@@ -95,20 +95,45 @@ fun ProfileScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // QR Code
-            val qrText = "${userData.fio}|${userData.group}|${userData.organization}"
+            // QR Code with interaction
+            val qrText = "${userData.fio ?: "Unknown"}|${userData.group ?: "N/A"}|${userData.organization ?: "N/A"}"
             val qrBitmap = remember { generateQrCode(qrText, 400) }
-            Surface(
-                color = Color.White,
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.padding(10.dp)
-            ) {
-                if (qrBitmap != null) {
-                    Image(
-                        bitmap = qrBitmap.asImageBitmap(),
-                        contentDescription = "QR Code",
-                        modifier = Modifier.size(156.dp)
-                    )
+            var showInfo by remember { mutableStateOf(false) }
+
+            Box(contentAlignment = Alignment.Center) {
+                Surface(
+                    color = Color.White,
+                    shape = RoundedCornerShape(10.dp),
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .clickable { showInfo = !showInfo }
+                ) {
+                    if (qrBitmap != null) {
+                        Image(
+                            bitmap = qrBitmap.asImageBitmap(),
+                            contentDescription = "QR Code",
+                            modifier = Modifier.size(156.dp)
+                        )
+                    }
+                }
+
+                if (showInfo) {
+                    Surface(
+                        color = Color.Black.copy(alpha = 0.9f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("Данные кода:", color = Color.Gray, fontSize = 10.sp)
+                            Text(userData.fio ?: "N/A", color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.Bold, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                            Text(userData.group ?: "N/A", color = Color.White, fontSize = 12.sp)
+                        }
+                    }
                 }
             }
 
@@ -121,11 +146,11 @@ fun ProfileScreen(
                 modifier = Modifier.fillMaxWidth(0.95f)
             ) {
                 Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    InfoRow(label = "ФИО:", value = userData.fio)
+                    InfoRow(label = "ФИО:", value = userData.fio ?: "N/A")
                     Divider(color = Color.White.copy(alpha = 0.2f))
-                    InfoRow(label = "Группа:", value = userData.group)
+                    InfoRow(label = "Группа:", value = userData.group ?: "N/A")
                     Divider(color = Color.White.copy(alpha = 0.2f))
-                    InfoRow(label = "Организация:", value = userData.organization)
+                    InfoRow(label = "Организация:", value = userData.organization ?: "N/A")
                 }
             }
         }

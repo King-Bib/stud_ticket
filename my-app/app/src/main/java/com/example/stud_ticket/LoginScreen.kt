@@ -20,9 +20,12 @@ import androidx.compose.ui.draw.clip
 import androidx.navigation.NavController
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.res.painterResource
-import kotlinx.coroutines.delay
+import com.example.stud_ticket.network.RetrofitClient
 import kotlinx.coroutines.launch
 import androidx.compose.material3.CircularProgressIndicator
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,6 +38,7 @@ fun LoginScreen(
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 
     Box(
@@ -158,7 +162,16 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage!!,
+                    color = Color.Red,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             // No separate login button in the second screenshot, but usually it's there or part of the flow.
             // I'll keep the navigation for now but stylize it as a pill if needed.
@@ -167,10 +180,30 @@ fun LoginScreen(
                     if (!isLoading) {
                         scope.launch {
                             isLoading = true
-                            delay(1500) // Simulated API call
-                            onLoginSuccess(SampleUser)
-                            isLoading = false
-                            navController.navigate(Screen.Profile.route)
+                            errorMessage = null
+                            try {
+                                val response = RetrofitClient.instance.login(LoginRequest(username, password))
+                                if (response.isSuccessful && response.body()?.status == "success") {
+                                    val loginResponse = response.body()!!
+                                    loginResponse.user?.let { onLoginSuccess(it) }
+                                    navController.navigate(Screen.Profile.route)
+                                } else {
+                                    val errorBody = response.errorBody()?.string()
+                                    errorMessage = if (errorBody != null) {
+                                        try {
+                                            JSONObject(errorBody).getJSONObject("errors").getJSONArray("email").getString(0)
+                                        } catch (e: Exception) {
+                                            "Неверный логин или пароль."
+                                        }
+                                    } else {
+                                        "Ошибка входа."
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                errorMessage = "Сеть недоступна."
+                            } finally {
+                                isLoading = false
+                            }
                         }
                     }
                 },

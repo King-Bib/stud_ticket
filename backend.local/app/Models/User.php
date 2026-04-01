@@ -24,7 +24,25 @@ class User extends Authenticatable
         'fio',
         'group',
         'organization',
+        'avatar_path',
     ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['avatar_url'];
+
+    /**
+     * Get the full URL for the user's avatar.
+     *
+     * @return string|null
+     */
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar_path ? asset('storage/' . $this->avatar_path) : null;
+    }
 
     /**
      * The attributes that should be hidden for serialization.
